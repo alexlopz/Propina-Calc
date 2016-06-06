@@ -1,4 +1,4 @@
-package com.androidegt.android.tipcal;
+package com.androidegt.android.tipcal.activities;
 
 import android.content.Context;
 import android.content.Intent;
@@ -13,6 +13,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import com.androidegt.android.tipcal.R;
+import com.androidegt.android.tipcal.TipCalcApp;
+import com.androidegt.android.tipcal.fragments.TipHistoryListFragment;
+import com.androidegt.android.tipcal.fragments.TipHistoryListFragmentListener;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -35,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     @Bind(R.id.txtTip)
     TextView txtTip;
 
+    private TipHistoryListFragmentListener fragmentListener;
+
     private final static int TIP_STEP_CHANGE = 1;
     private final static int DEFAULT_TIP_PERCENTAGE = 10;
 
@@ -43,6 +50,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        TipHistoryListFragment fragment = (TipHistoryListFragment) getSupportFragmentManager()
+                                                                    .findFragmentById(R.id.fragmentList);
+        fragment.setRetainInstance(true);
+        fragmentListener = (TipHistoryListFragmentListener)fragment;
 
     }
 
@@ -65,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
     @OnClick(R.id.btnSubmit)
     public void handleClickSubmit(){
         hideKeyboard();
+
         String strInputTotal = inputBill.getText().toString().trim();
         if(!strInputTotal.isEmpty()){
             double total = Double.parseDouble(strInputTotal);
@@ -72,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
             double tip = total*(tipPercentage/100d);
 
             String strTip = String.format(getString(R.string.global_message_tip), tip);
+            fragmentListener.action(strTip);
             txtTip.setVisibility(View.VISIBLE);
             txtTip.setText(strTip);
         }
