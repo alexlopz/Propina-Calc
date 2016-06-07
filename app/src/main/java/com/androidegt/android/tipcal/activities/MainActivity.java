@@ -18,6 +18,9 @@ import com.androidegt.android.tipcal.R;
 import com.androidegt.android.tipcal.TipCalcApp;
 import com.androidegt.android.tipcal.fragments.TipHistoryListFragment;
 import com.androidegt.android.tipcal.fragments.TipHistoryListFragmentListener;
+import com.androidegt.android.tipcal.models.TipRecord;
+
+import java.util.Date;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -27,16 +30,8 @@ import butterknife.OnItemClick;
 public class MainActivity extends AppCompatActivity {
     @Bind(R.id.inputBill)
     EditText inputBill;
-    @Bind(R.id.btnSubmit)
-    Button btnSubmit;
     @Bind(R.id.inputPercentage)
     EditText inputPercentage;
-    @Bind(R.id.btnIncrease)
-    Button btnIncrease;
-    @Bind(R.id.btnDecrease)
-    Button btnDecrease;
-    @Bind(R.id.btnClear)
-    Button btnClear;
     @Bind(R.id.txtTip)
     TextView txtTip;
 
@@ -82,10 +77,15 @@ public class MainActivity extends AppCompatActivity {
         if(!strInputTotal.isEmpty()){
             double total = Double.parseDouble(strInputTotal);
             int tipPercentage =  getTipPercentage();
-            double tip = total*(tipPercentage/100d);
 
-            String strTip = String.format(getString(R.string.global_message_tip), tip);
-            fragmentListener.action(strTip);
+            TipRecord tipRecord = new TipRecord();
+            tipRecord.setBill(total);
+            tipRecord.setTipPercentage(tipPercentage);
+            tipRecord.setTimestamp(new Date());
+
+
+            String strTip = String.format(getString(R.string.global_message_tip), tipRecord.getTip());
+            fragmentListener.addToList(tipRecord);
             txtTip.setVisibility(View.VISIBLE);
             txtTip.setText(strTip);
         }
@@ -103,6 +103,11 @@ public class MainActivity extends AppCompatActivity {
         hideKeyboard();
         handleTipChange(-TIP_STEP_CHANGE);
 
+    }
+
+    @OnClick(R.id.btnClear)
+    public void handleClickClaer(){
+        fragmentListener.clearList();
     }
 
     private void handleTipChange(int change){
